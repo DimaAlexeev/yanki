@@ -1,0 +1,42 @@
+.headerMenu {
+    width: 1002px;
+    height: 40px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.menuLinks {
+    display: flex;
+    align-items: center;
+}
+
+.menuLinks ul {
+    display: flex;
+    list-style-type: none;
+}
+
+.menuLinks ul li {
+    margin-right: 25px;
+}
+
+.menuLinks ul li a {
+    font-weight: 300;
+    font-size: 18px;
+    color: #FFFFFF;
+}
+
+.nameSite {
+    color: #FFFFFF;
+    font-size: 50px;
+    line-height: 40px;
+}
+
+.menuIcons {
+    display: flex;
+    align-items: center;
+}
+
+.menuIcons img {
+    margin-left: 30px;
+ }
