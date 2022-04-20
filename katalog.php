@@ -80,7 +80,8 @@ require_once('block/modalCart.php');
                 for($i=0; $i <= COUNT($arrayColor); $i++) {
                     $lineColor .= "<span class='".trim($arrayColor[$i])."'></span>";
                 }
-
+                $dir = "admin/upload/".$row_text['article'].'/';
+                $img = scandir($dir);
                 printf(
                     '<div class="cartBlock">
                         <a href="show.php?tovar=%s">
@@ -108,7 +109,7 @@ require_once('block/modalCart.php');
                             </div>
                         </a>
                      </div>
-                ',$row_text['id'],$row_text['title_img'], $row_text['name'], $row_text['cena'], $lineSize,  $lineColor);
+                ',$row_text['id'],$dir.$img[2], $row_text['name'], $row_text['cena'], $lineSize,  $lineColor);
 
             } ?>
         
