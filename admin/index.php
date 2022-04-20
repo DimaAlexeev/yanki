@@ -12,9 +12,9 @@ $result = mysqli_query($link,$sql_text);
     <title>добавление товара</title>
 </head>
 <body>
-    <form method="POST" action="index.php">
+    <form method="POST" action="index.php" enctype="multipart/form-data">
         <input type="text" name="name" placeholder="Наименование товара"> <br />
-        <input type="text" name="cena" placeholder="Стоимость товара"> <br />
+        <input type="number" name="cena" placeholder="Стоимость товара"> <br />
         <select name="id_color">
             <option value="white">white</option>
             <option value="Blue">Blue</option>
@@ -40,6 +40,8 @@ $result = mysqli_query($link,$sql_text);
         ?>
         </select>
         <br />
+        <input type="file" name="images[]" multiple>
+        <br />
         <input type="submit" value="Добавить" >
     </form>
 </body>
@@ -48,7 +50,7 @@ $result = mysqli_query($link,$sql_text);
 <?
 if(!empty($_POST)){
     
-    $name = $_POST['name'];
+    $nameTovar = $_POST['name'];
     $cena = $_POST['cena'];
     $id_color =  $_POST['id_color'];
     $id_size =  $_POST['id_size'];
@@ -56,25 +58,93 @@ if(!empty($_POST)){
     $sostav = $_POST['sostav'];
     $length = $_POST['length'];
     $id_katalog = $_POST['id_katalog'];
- 
-    if($name  == ""){
-        echo "Поле name обязательное";
-        exit();
+    $article = time() + rand(1,100);
+    $PathsaveFile = __DIR__ . '/upload/'.$article.'/';
+    $title_img = "";
+    mkdir($PathsaveFile, 0777, true);
+
+    if(!$nameTovar){
+        exit("Поле name обязательное");
     }
 
-    if($id_katalog == ""){
-        echo "Поле id_katalog обязательное <a href='http://auto-site.com/addedText.php'>вернуться</a>";
-        exit();
+    if(!$id_katalog){
+        exit("Поле id_katalog обязательное <a href='http://auto-site.com/addedText.php'>вернуться</a>");
     }
 
-    if($length == ""){
-        echo "Поле length  обязательное <a href='http://auto-site.com/addedText.php'>вернуться</a>";
-        exit();
+    if(!$length){
+        exit("Поле length  обязательное <a href='http://auto-site.com/addedText.php'>вернуться</a>");
     }
 
-$sql = "INSERT INTO tovar (`name`, cena, id_color, id_size, `description`, sostav, `length`, id_katalog) VALUES (?,?,?,?,?,?,?,?)";
+
+    if (isset($_FILES['images'])) {
+        // Изменим структуру $_FILES
+        foreach($_FILES['images'] as $key => $value) {
+            foreach($value as $k => $v) {
+                $_FILES['images'][$k][$key] = $v;
+            }
+            // Удалим старые ключи
+            unset($_FILES['images'][$key]);
+        }
+        // Загружаем все картинки по порядку
+        foreach ($_FILES['images'] as $k => $v) {
+            // Загружаем по одному файлу
+            $fileName = $_FILES['images'][$k]['name'];
+            $fileTmpName = $_FILES['images'][$k]['tmp_name'];
+            $fileType = $_FILES['images'][$k]['type'];
+            $fileSize = $_FILES['images'][$k]['size'];
+            $errorCode = $_FILES['images'][$k]['error'];
+    
+            // Проверим на ошибки
+            if ($errorCode !== UPLOAD_ERR_OK || !is_uploaded_file($fileTmpName)) {
+                // Зададим неизвестную ошибку
+                die('При загрузке файла произошла неизвестная ошибка.');
+            } else {
+                // Создадим ресурс FileInfo
+                $fi = finfo_open(FILEINFO_MIME_TYPE);
+                // Получим MIME-тип
+                $mime = (string) finfo_file($fi, $fileTmpName);
+                // Проверим ключевое слово image (image/jpeg, image/png и т. д.)
+                if (strpos($mime, 'image') === false) die('Можно загружать только изображения.');
+                // Результат функции запишем в переменную
+                $image = getimagesize($fileTmpName);
+               
+                // Сгенерируем новое имя файла через функцию getRandomFileName()
+                $name = getRandomFileName($fileTmpName);
+                // Сгенерируем расширение файла на основе типа картинки
+                $extension = image_type_to_extension($image[2]);
+                // Сократим .jpeg до .jpg
+                $format = str_replace('jpeg', 'jpg', $extension);
+                // Переместим картинку с новым именем и расширением в папку /upload
+                if (!move_uploaded_file($fileTmpName, $PathsaveFile. $name . $format)) {
+                    die('При записи изображения на диск произошла ошибка.');
+                }
+                $title_img = $PathsaveFile. $name . $format;
+            }
+        };
+        echo 'Файлы успешно загружены!';
+    };
+    
+    
+   
+
+
+$sql = "INSERT INTO tovar (`name`, article, title_img, cena, id_color, id_size, `description`, sostav, `length`, id_katalog) VALUES (?,?,?,?,?,?,?,?,?,?)";
 $stmt = mysqli_prepare($link,$sql);
-  mysqli_stmt_bind_param($stmt , 'sissssii' ,  $name , $cena  , $id_color  , $id_size, $description, $sostav, $length,  $id_katalog );
+mysqli_stmt_bind_param($stmt, 'sssissssii',  $nameTovar, $article, $title_img, $cena, $id_color, $id_size, $description, $sostav, $length,  $id_katalog );
 mysqli_stmt_execute($stmt); 
 }
+
+// File functions.php
+function getRandomFileName($path) {
+    $path = $path ? $path . '/' : '';
+
+    do {
+        $name = md5(microtime() . rand(0, 9999));
+        $file = $path . $name;
+    } while (file_exists($file));
+
+    return $name;
+}
+    
+
 ?>

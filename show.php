@@ -53,14 +53,15 @@
         </li>
     </ul>
 </div>
-
+<?
+ $dir = "admin/upload/".$row_text['article'].'/';
+ $img = scandir($dir);
+?>
 <div class="showCart">
     <div class="left"> 
         <div class="slimImg" onclick="showImg(event)">
-            <img src=" <?=$row_text['title_img']?>">
+            <img src="<?=$dir.$img[2]?>">
             <?
-                $dir = "img_shop/".$row_text['id'].'/';
-                $img = scandir($dir);
                 foreach($img as $value) {
                     if($value == '.' || $value == "..")  {} else {
                          echo '<img src="'.$dir.$value.'">';
@@ -69,7 +70,7 @@
             ?>
         </div>
         <div class="BigImg" >
-            <img src=" <?=$row_text['title_img']?>" id="bigImg">
+            <img src="<?=$dir.$img[2]?>" id="bigImg">
         </div>
     </div>
 
