@@ -46,7 +46,6 @@ $result = mysqli_query($link,$sql_text);
     </form>
 </body>
 </html>
-
 <?
 if(!empty($_POST)){
     
@@ -126,8 +125,6 @@ if(!empty($_POST)){
     
     
    
-
-
 $sql = "INSERT INTO tovar (`name`, article, title_img, cena, id_color, id_size, `description`, sostav, `length`, id_katalog) VALUES (?,?,?,?,?,?,?,?,?,?)";
 $stmt = mysqli_prepare($link,$sql);
 mysqli_stmt_bind_param($stmt, 'sssissssii',  $nameTovar, $article, $title_img, $cena, $id_color, $id_size, $description, $sostav, $length,  $id_katalog );
